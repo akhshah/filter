@@ -2,11 +2,19 @@ FROM ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \ 
+# Install necessary packages
+# TODO(akhil): May need to set this up to use specific packages instead of the
+# apt-repo
+RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     build-essential \
-    libeigen3-dev \
     gdb \
-    libboost-all-dev
+    libboost-all-dev \
+    libeigen3-dev \
+    libgtest-dev
+
+RUN mkdir -p /usr/filter
+
+COPY . /usr/filter
 
 ENTRYPOINT ["bash"]
