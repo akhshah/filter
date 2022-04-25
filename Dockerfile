@@ -8,4 +8,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #    libeigen3-dev \
     gdb
 
-ENTRYPOINT ["zsh"]
+ENTRYPOINT ["bash"]
