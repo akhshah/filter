@@ -11,9 +11,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gdb \
     libboost-all-dev \
     libeigen3-dev \
-    libgtest-dev
+    libgtest-dev \
+    ninja
 
 RUN mkdir -p /usr/filter
+ENV CMAKE_GENERATOR=Ninja
 
 COPY . /usr/filter
 
