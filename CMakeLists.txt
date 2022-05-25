@@ -9,7 +9,7 @@ set(ENV{CMAKE_GENERATOR})
 find_package(Eigen3 3.3 REQUIRED)
 
 # Link in GTest
-find_package(GTEST 1.10 REQUIRED)
+find_package(GTest 1.10 REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_subdirectory(src)
