@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.15...3.31)
+
+set(CMAKE_C_COMPILER "gcc-14")
+set(CMAKE_CXX_COMPILER "g++-14")
+
 project(Filter VERSION 0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
