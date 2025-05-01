@@ -4,8 +4,9 @@
 
 #include <Eigen/Core>
 
+#include "src/math/eigen_types.hpp"
+
 namespace math {
-namespace integrator {
 
 template<int N>
 class Integrator{
@@ -15,15 +16,14 @@ public:
     /**
      * Integrator abstract class
      **/
-    Integrator(const std::function<Eigen::Matrix<double, N, 1>(double, const Eigen::Matrix<double, N, 1>&)>& func) : func_(func) {};
+    Integrator(const std::function<VectorNd<N>(double, const VectorNd<N>&)>& func) : func_(func) {};
 
-    virtual Eigen::Matrix<double, N, 1> Integrate(const Eigen::Matrix<double, N, 1>& current_state, const double timestep) = 0;
+    virtual VectorNd<N> Integrate(const VectorNd<N>& current_state, const double timestep) = 0;
 
-    const std::function<Eigen::Matrix<double, N, 1>(double, const Eigen::Matrix<double, N, 1>&)>& Get();
+    const std::function<VectorNd<N>(double, const VectorNd<N>&)>& Get();
 
 private:
-    const std::function<Eigen::Matrix<double, N, 1>(double, const Eigen::Matrix<double, N, 1>&)> func_;
+    const std::function<VectorNd<N>(double, const VectorNd<N>&)> func_;
 };
 
-} // namespace integrator
 } // namespace math
