@@ -11,6 +11,4 @@ list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew/share/"
     "/opt/homebrew/include")
 find_package(Eigen3 REQUIRED NO_MODULE)
 
-add_executable("${PROJECT_NAME}" ./main.cpp)
-
-target_link_libraries("${PROJECT_NAME}" Eigen3::Eigen)
+add_subdirectory(src)
