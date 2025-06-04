@@ -26,8 +26,6 @@ public:
 
     void Process(const VectorNd<N>& state, const MatrixNd<N>& covariance, const std::unique_ptr<Integrator>& integrator, VectorNd<N>* updated_mean, MatrixNd<N>* update_covariance);
 
-    void Process(const VectorNd<N>& state, const MatrixNd<N>& covariance, const std::function<VectorNd<N>(const VectorNd<N>&)>& func, VectorNd<N>* updated_mean, MatrixNd<N>* updated_covariance);
-
     /**
      *
      * Getters
@@ -56,16 +54,16 @@ template<std::size_t N>
 UnscentedTransform<N>::UnscentedTransform(const double alpha, const double beta) : alpha_(alpha), beta_(beta) {
     kappa_ = 3. - static_cast<double>(N);
     lambda_ = alpha_ * alpha_ * (static_cast<double>(N) + kappa_) - static_cast<double>(N);
-mean_weights.reserve(2 * N  + 1);
-    mean_weights.emplace_back(lambda_ / (static_cast<double>(N) + lambda_));
+    mean_weights_.reserve(2 * N  + 1);
+    mean_weights_.emplace_back(lambda_ / (static_cast<double>(N) + lambda_));
 
     const double other_weights = 1 / (2 * (N + lambda_));
     for (int i = 1; i < 2 * N; ++i) {
-        mean_weights.emplace_back(other_weights);
+        mean_weights_.emplace_back(other_weights);
     }
 
     cov_weights_ = mean_weights_;
-    cov_weights[0] += (1. - alpha_ * alpha_ + beta_);
+    cov_weights_[0] += (1. - alpha_ * alpha_ + beta_);
 }
 
 template<std::size_t N>
@@ -88,7 +86,35 @@ std::vector<Eigen::Matrix<double, N, 1>> UnscentedTransform<N>::GenerateSigmaPoi
 }
 
 template<std::size_t N>
-void Process(const VectorNd<N>& state, const MatrixNd<N>& covariance, const std::unique_ptr<Integrator>&
+void Process(const VectorNd<N>& state, const MatrixNd<N>& covariance, const std::unique_ptr<Integrator>& integrator, const double timestep, VectorNd<N>* updated_mean, MatrixNd<N>* updated_covariance) {
+    if (!updated_mean || !updated_covariance) {
+        // TODO: Perhaps this should throw instead.
+        return;
+    }
+
+    // Generate sigma points.
+    const std::vector<VectorNd<N>> sigma_points = GenerateSigmaPoints(state, covariance);
+
+    // Process sigma points with integrator.
+    std::vector<VectorNd<N>> processed_sigma_points;
+    processed_sigma_points.reserve(sigma_points.size());
+
+    for (const VectorNd<N>& sigma_point : sigma_points) {
+        processed_sigma_points.emplace_back(integrator->Integrate(sigma_point, timestep));
+    }
+
+    // Calculate mean.
+    updated_mean = VectorNd<N>::Zeros();
+    for (std::size_t i = 0; i < processed_sigma_points.size(); ++i) {
+        updated_mean += mean_weights_.at(i) * processed_sigma_points.at(i);
+    }
+
+    // Now using this updated mean calculate the new covariance.
+    updated_covariance = MatrixNd<N>::Zeros();
+    for (std::size_t i = 0; i < processed_sigma_points.size(); ++i) {
+        const VectorNd<N> difference = (processed_sigma_points.at(i) - updated_mean);
+        updated_covariance += cov_weights_.at(i) * difference * difference.transpose();
+    }
+}
 
 } // namespace math
-
