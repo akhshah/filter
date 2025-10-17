@@ -6,8 +6,12 @@
 
 #include "integrator.h"
 
+namespace math {
+namespace integrator {
+
 template<int N>
 class RK45 : Integrator<N> {
-    RK45
 
-};
+
+} // namespace integrator
+} // namespace math
